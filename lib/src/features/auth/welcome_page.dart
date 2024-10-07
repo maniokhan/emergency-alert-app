@@ -1,5 +1,6 @@
 import 'package:emergency_alert_app/src/features/auth/login.dart';
 import 'package:emergency_alert_app/src/features/auth/signup.dart';
+import 'package:emergency_alert_app/src/features/help_center/home.dart';
 import 'package:flutter/material.dart';
 
 class LoginSignUpPage extends StatelessWidget {
@@ -42,7 +43,7 @@ class LoginSignUpPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15), color: Colors.red),
                 child: Center(
                     child: Text(
-                  'Login',
+                  'User',
                   style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
@@ -64,7 +65,7 @@ class LoginSignUpPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => EmergencyHelpCenterPage()),
                 );
               },
               child: Container(
@@ -77,7 +78,7 @@ class LoginSignUpPage extends StatelessWidget {
                     color: Colors.white),
                 child: Center(
                     child: Text(
-                  'Sign Up',
+                  'Help Center',
                   style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
