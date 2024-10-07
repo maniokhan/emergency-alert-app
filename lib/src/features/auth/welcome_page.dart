@@ -1,5 +1,5 @@
-import 'package:emergencyapp/login.dart';
-import 'package:emergencyapp/signup.dart';
+import 'package:emergency_alert_app/src/features/auth/login.dart';
+import 'package:emergency_alert_app/src/features/auth/signup.dart';
 import 'package:flutter/material.dart';
 
 class LoginSignUpPage extends StatelessWidget {
@@ -16,7 +16,7 @@ class LoginSignUpPage extends StatelessWidget {
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height /7,
+              height: MediaQuery.of(context).size.height / 7,
             ),
             Container(
               height: MediaQuery.of(context).size.height / 1.8,
@@ -29,20 +29,25 @@ class LoginSignUpPage extends StatelessWidget {
             Spacer(),
             GestureDetector(
               onTap: () {
-                 Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
               child: Container(
                 height: 60,
-                width: MediaQuery.of(context).size.width/1.5,
+                width: MediaQuery.of(context).size.width / 1.5,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.red
-                ),
-                child: Center(child: Text('Login', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16,color: Colors.white),)),
+                    borderRadius: BorderRadius.circular(15), color: Colors.red),
+                child: Center(
+                    child: Text(
+                  'Login',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      color: Colors.white),
+                )),
               ),
             ),
             // ElevatedButton(
@@ -56,22 +61,28 @@ class LoginSignUpPage extends StatelessWidget {
             // ),
             SizedBox(height: 20),
             GestureDetector(
-              onTap: (){
-                  Navigator.push(
+              onTap: () {
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SignUpPage()),
                 );
               },
               child: Container(
                 height: 60,
-                width: MediaQuery.of(context).size.width/1.5,
+                width: MediaQuery.of(context).size.width / 1.5,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  // border: Border.all(color: Colors.red),
-                  color: Colors.white
-                ),
-                child: Center(child: Text('Sign Up', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16,color: Colors.red),)),
+                    borderRadius: BorderRadius.circular(15),
+                    // border: Border.all(color: Colors.red),
+                    color: Colors.white),
+                child: Center(
+                    child: Text(
+                  'Sign Up',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      color: Colors.red),
+                )),
               ),
             ),
             // ElevatedButton(

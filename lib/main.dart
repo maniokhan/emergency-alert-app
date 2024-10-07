@@ -1,7 +1,4 @@
-import 'package:emergencyapp/ai_text_detector.dart';
-import 'package:emergencyapp/humanitize_text.dart';
-import 'package:emergencyapp/splash_screen.dart';
-import 'package:emergencyapp/text_paraphrase.dart';
+import 'package:emergency_alert_app/src/features/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,12 +14,10 @@ class MyApp extends StatelessWidget {
       title: 'Emergency App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-       
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-     home: TextParaphrasingPage(),
+      home: SplashScreen(),
     );
   }
 }
-
