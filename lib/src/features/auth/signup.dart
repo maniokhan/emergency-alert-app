@@ -1,3 +1,4 @@
+import 'package:emergency_alert_app/src/features/auth/contact_save_form.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -47,7 +48,7 @@ class SignUpPage extends StatelessWidget {
                 onTap: (){
                     Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SignUpPage()),
+                    MaterialPageRoute(builder: (context) => EmergencyContactsPage()),
                   );
                 },
                 child: Container(
