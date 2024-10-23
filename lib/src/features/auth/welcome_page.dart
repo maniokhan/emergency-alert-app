@@ -98,14 +98,15 @@
 import 'package:emergency_alert_app/src/common_widgets/common_button.dart';
 import 'package:emergency_alert_app/src/features/auth/login.dart';
 import 'package:emergency_alert_app/src/features/auth/signup.dart';
-import 'package:emergency_alert_app/src/features/help_center/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class LoginSignUpPage extends StatelessWidget {
+class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         elevation: 0.0,
         backgroundColor: Colors.transparent,
       ),

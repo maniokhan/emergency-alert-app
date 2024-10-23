@@ -1,5 +1,7 @@
 import 'package:emergency_alert_app/src/features/auth/welcome_page.dart';
+import 'package:emergency_alert_app/src/features/user/user_home.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
 class SplashScreen extends StatefulWidget {
@@ -11,9 +13,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    // Check auth state
     Timer(Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => LoginSignUpPage()));
+      FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        if (user == null) {
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => WelcomePage()));
+        } else {
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => UserHomePage()));
+        }
+      });
     });
   }
 
