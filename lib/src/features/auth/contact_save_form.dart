@@ -322,7 +322,10 @@ class _AddEmergencyContactsPageState extends State<AddEmergencyContactsPage> {
       });
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => UserHomePage()),
+        MaterialPageRoute(
+            builder: (context) => UserHomePage(
+                  uid: widget.uid,
+                )),
       );
     } catch (e) {
       // Handle Firestore errors
@@ -347,7 +350,9 @@ class _AddEmergencyContactsPageState extends State<AddEmergencyContactsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Text('Save Emergency Contacts'),
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [
@@ -415,7 +420,7 @@ class _AddEmergencyContactsPageState extends State<AddEmergencyContactsPage> {
                                 ),
                                 if (emergencyContacts.length > 1)
                                   IconButton(
-                                    icon: Icon(Icons.remove_circle,
+                                    icon: const Icon(Icons.remove_circle,
                                         color: Colors.red),
                                     onPressed: () => removeContact(index),
                                   ),

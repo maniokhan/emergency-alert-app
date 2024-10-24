@@ -132,12 +132,14 @@ class AuthService {
       setLoading(true); // Set loading to true
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      print(userCredential.user!.email);
-      print(userCredential.user!.uid);
       await Future.delayed(const Duration(seconds: 1));
       setLoading(false); // Set loading to false after process completes
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (BuildContext context) => UserHomePage()));
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => UserHomePage(
+                    uid: userCredential.user!.uid,
+                  )));
     } on FirebaseAuthException catch (e) {
       setLoading(false); // Set loading to false on error
       String message = '';
