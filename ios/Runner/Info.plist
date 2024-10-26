@@ -2,6 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Location Permissions -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app requires access to your location to send your current position in case of an emergency.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>This app requires access to your location even in the background to send your current position in case of an emergency.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This app requires access to your location both in the background and while the app is in use to send your current position in case of an emergency.</string>
+
+    <!-- Contacts Permission -->
+    <key>NSContactsUsageDescription</key>
+    <string>This app requires access to your contacts to select emergency contacts.</string>
+
+    <!-- Explanation for SMS (not a direct permission in iOS, used for description purposes) -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app requires access to SMS functionality to send emergency alerts.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

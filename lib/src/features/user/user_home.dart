@@ -1,9 +1,16 @@
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_alert_app/src/features/auth/auth_services.dart';
-import 'package:emergency_alert_app/src/features/auth/contact_save_form.dart';
+// import 'package:emergency_alert_app/src/features/auth/contact_save_form.dart';
 import 'package:emergency_alert_app/src/features/user/manage_emergency_contacts_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sms/flutter_sms.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:uuid/uuid.dart';
+// import 'package:permission_handler/permission_handler.dart';
+// import 'package:sms_advanced/sms_advanced.dart';
 
 class UserHomePage extends StatefulWidget {
   final String uid;
@@ -19,6 +26,7 @@ class _UserHomePageState extends State<UserHomePage> {
   bool _isGlowing = false;
   bool _isLoggingOut = false;
   Map<String, dynamic> userData = {};
+  List<String> numbers = [];
   @override
   void initState() {
     // TODO: implement initState
@@ -31,8 +39,108 @@ class _UserHomePageState extends State<UserHomePage> {
     if (user!.isNotEmpty) {
       setState(() {
         userData = user;
+        if (userData.containsKey('emergency_contacts') &&
+            userData['emergency_contacts'] is List) {
+          numbers = (userData['emergency_contacts'] as List)
+              .map((contact) => contact['number'].toString())
+              .toList();
+        }
       });
-      print(userData);
+    }
+  }
+
+  // _sendSMS() async {
+  //   if (numbers.isEmpty) {
+  //     Fluttertoast.showToast(
+  //       msg:
+  //           "Please add some emergency contacts before sending an SOS message.",
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.SNACKBAR,
+  //       backgroundColor: Colors.black54,
+  //       textColor: Colors.white,
+  //       fontSize: 14.0,
+  //     );
+  //   } else {
+  //     if (await Permission.sms.request().isGranted) {
+  //       await sendSMS(
+  //           message: "Test Message From Flutter App",
+  //           recipients: numbers,
+  //           sendDirect: true);
+  //     }
+  //   }
+  // }
+
+  Future<void> _sendSOS() async {
+    // Check if emergency contacts are available
+    if (numbers.isEmpty) {
+      Fluttertoast.showToast(
+        msg:
+            "Please add some emergency contacts before sending an SOS message.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.SNACKBAR,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 14.0,
+      );
+    } else {
+      // Request location permission and get user's location
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
+        return;
+      }
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.deniedForever) {
+          return;
+        }
+      }
+
+      Position position = await Geolocator.getCurrentPosition();
+
+      // Create Google Maps link with current location
+      String mapsLink =
+          "https://maps.google.com/?q=${position.latitude},${position.longitude}";
+      String sosMessage = "SOS! I need help. My current location: $mapsLink";
+
+      // Check SMS permission and send message
+      if (await Permission.sms.request().isGranted) {
+        setState(() {
+          _isGlowing = true;
+        });
+        await sendSMS(
+          message: sosMessage,
+          recipients: numbers,
+          sendDirect: true,
+        );
+        String sosID = const Uuid().v1();
+        await FirebaseFirestore.instance
+            .collection('SOS-Requests')
+            .doc(sosID)
+            .set({
+          "sosReqID": sosID,
+          "userID": widget.uid,
+          "latitude": position.latitude,
+          "longitude": position.longitude,
+          "message": sosMessage,
+        });
+        ;
+        Fluttertoast.showToast(
+          msg: "SOS message sended successfully!",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.SNACKBAR,
+          backgroundColor: Colors.black54,
+          textColor: Colors.white,
+          fontSize: 14.0,
+        );
+        Future.delayed(const Duration(seconds: 2));
+        setState(() {
+          _isGlowing = false;
+        });
+      }
     }
   }
 
@@ -120,10 +228,8 @@ class _UserHomePageState extends State<UserHomePage> {
               ),
               Center(
                 child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isGlowing = !_isGlowing;
-                    });
+                  onTap: () async {
+                    await _sendSOS();
                   },
                   child: AvatarGlow(
                     glowColor: Colors.red,

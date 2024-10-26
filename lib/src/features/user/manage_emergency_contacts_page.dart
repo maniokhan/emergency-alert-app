@@ -27,7 +27,6 @@ class _ManageEmergencyContactsPageState
   }
 
   // Fetch emergency contacts from Firestore
-  // Fetch emergency contacts from Firestore
   Future<void> _fetchEmergencyContacts() async {
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
