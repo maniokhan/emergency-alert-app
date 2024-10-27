@@ -1,16 +1,6 @@
-# emergency_alert_app
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+https://github.com/user-attachments/assets/b9b15f6a-acb3-4a1b-98a6-10f095d97760
+https://github.com/user-attachments/assets/7e81ffd4-8330-4948-b330-5853338339f7
+https://github.com/user-attachments/assets/80601520-9559-42e5-9066-2c1b9ebc473a
+https://github.com/user-attachments/assets/4423b0ed-814c-498a-a627-8245f5e142b0
+https://github.com/user-attachments/assets/7ac1b229-0019-4daf-9a7c-72c71ed9e326
+https://github.com/user-attachments/assets/04934d04-b509-470b-9c95-4fd4fc7be680
