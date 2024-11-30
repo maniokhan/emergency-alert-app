@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_alert_app/src/common_widgets/common_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:contacts_service/contacts_service.dart';
+// import 'package:contacts_service/contacts_service.dart';
 
 class ManageEmergencyContactsPage extends StatefulWidget {
   final String uid; // Pass the user ID (UID)
@@ -105,12 +106,19 @@ class _ManageEmergencyContactsPageState
   // Function to pick a contact from phone
   Future<void> _pickContact(int index) async {
     if (await Permission.contacts.request().isGranted) {
-      final Contact? contact = await ContactsService.openDeviceContactPicker();
+      // final Contact? contact = await ContactsService.openDeviceContactPicker();
+      List<Contact> contacts = await FlutterContacts.getContacts();
+      contacts = await FlutterContacts.getContacts(
+          withProperties: true, withPhoto: true);
+
+      // Get contact with specific ID (fully fetched)
+      // Contact? contact = await FlutterContacts.getContact(contacts.first.id);
+      final contact = await FlutterContacts.openExternalPick();
       if (contact != null) {
         setState(() {
           emergencyContacts[index]['name'] = contact.displayName ?? '';
-          if (contact.phones != null && contact.phones!.isNotEmpty) {
-            emergencyContacts[index]['number'] = contact.phones!.first.value!;
+          if (contact.phones != null && contact.phones.isNotEmpty) {
+            emergencyContacts[index]['number'] = contact.phones.first.number;
           }
         });
       }

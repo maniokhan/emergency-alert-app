@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contacts_service/contacts_service.dart';
+// import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:emergency_alert_app/src/common_widgets/common_button.dart';
@@ -46,13 +47,19 @@ class _AddEmergencyContactsPageState extends State<AddEmergencyContactsPage> {
   Future<void> _pickContact(int index) async {
     if (await Permission.contacts.request().isGranted) {
       // Get the contact from the phone's contact list
-      final Contact? contact = await ContactsService.openDeviceContactPicker();
+      List<Contact> contacts = await FlutterContacts.getContacts();
+      contacts = await FlutterContacts.getContacts(
+          withProperties: true, withPhoto: true);
+
+      // Get contact with specific ID (fully fetched)
+      // Contact? contact = await FlutterContacts.getContact(contacts.first.id);
+      final contact = await FlutterContacts.openExternalPick();
       if (contact != null) {
         setState(() {
           emergencyContacts[index]['name'] = contact.displayName ?? '';
-          if (contact.phones != null && contact.phones!.isNotEmpty) {
+          if (contact.phones != null && contact.phones.isNotEmpty) {
             emergencyContacts[index]['number'] =
-                contact.phones!.first.value ?? '';
+                contact.phones.first.number ?? '';
           }
         });
       }
