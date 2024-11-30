@@ -107,9 +107,9 @@ class _ManageEmergencyContactsPageState
   Future<void> _pickContact(int index) async {
     if (await Permission.contacts.request().isGranted) {
       // final Contact? contact = await ContactsService.openDeviceContactPicker();
-      List<Contact> contacts = await FlutterContacts.getContacts();
-      contacts = await FlutterContacts.getContacts(
-          withProperties: true, withPhoto: true);
+      // List<Contact> contacts = await FlutterContacts.getContacts();
+      // contacts = await FlutterContacts.getContacts(
+      //     withProperties: true, withPhoto: true);
 
       // Get contact with specific ID (fully fetched)
       // Contact? contact = await FlutterContacts.getContact(contacts.first.id);
@@ -124,7 +124,8 @@ class _ManageEmergencyContactsPageState
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Permission to access contacts is denied')),
+        const SnackBar(
+            content: Text('Permission to access contacts is denied')),
       );
     }
   }

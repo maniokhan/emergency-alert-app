@@ -47,9 +47,9 @@ class _AddEmergencyContactsPageState extends State<AddEmergencyContactsPage> {
   Future<void> _pickContact(int index) async {
     if (await Permission.contacts.request().isGranted) {
       // Get the contact from the phone's contact list
-      List<Contact> contacts = await FlutterContacts.getContacts();
-      contacts = await FlutterContacts.getContacts(
-          withProperties: true, withPhoto: true);
+      // List<Contact> contacts = await FlutterContacts.getContacts();
+      // contacts = await FlutterContacts.getContacts(
+      //     withProperties: true, withPhoto: true);
 
       // Get contact with specific ID (fully fetched)
       // Contact? contact = await FlutterContacts.getContact(contacts.first.id);

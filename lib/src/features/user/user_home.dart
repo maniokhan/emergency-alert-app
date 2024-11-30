@@ -108,38 +108,62 @@ class _UserHomePageState extends State<UserHomePage> {
 
       // Check SMS permission and send message
       if (await Permission.sms.request().isGranted) {
-        setState(() {
-          _isGlowing = true;
-        });
-        await sendSMS(
-          message: sosMessage,
-          recipients: numbers,
-          sendDirect: true,
-        );
-        String sosID = const Uuid().v1();
-        await FirebaseFirestore.instance
-            .collection('SOS-Requests')
-            .doc(sosID)
-            .set({
-          "sosReqID": sosID,
-          "userID": widget.uid,
-          "latitude": position.latitude,
-          "longitude": position.longitude,
-          "message": sosMessage,
-        });
-        ;
-        Fluttertoast.showToast(
-          msg: "SOS message sended successfully!",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.SNACKBAR,
-          backgroundColor: Colors.black54,
-          textColor: Colors.white,
-          fontSize: 14.0,
-        );
-        Future.delayed(const Duration(seconds: 2));
-        setState(() {
-          _isGlowing = false;
-        });
+        try {
+          bool canSend = await canSendSMS();
+          if (!canSend) {
+            Fluttertoast.showToast(
+              msg: "Your device is not capable of sending text messages.",
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+            );
+            return;
+          }
+          setState(() {
+            _isGlowing = true;
+          });
+          await sendSMS(
+            message: sosMessage,
+            recipients: numbers,
+            sendDirect: true,
+          );
+          String sosID = const Uuid().v1();
+          await FirebaseFirestore.instance
+              .collection('SOS-Requests')
+              .doc(sosID)
+              .set({
+            "sosReqID": sosID,
+            "userID": widget.uid,
+            "latitude": position.latitude,
+            "longitude": position.longitude,
+            "message": sosMessage,
+          });
+          Fluttertoast.showToast(
+            msg: "SOS message sended successfully!",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.SNACKBAR,
+            backgroundColor: Colors.black54,
+            textColor: Colors.white,
+            fontSize: 14.0,
+          );
+          Future.delayed(const Duration(seconds: 2));
+          setState(() {
+            _isGlowing = false;
+          });
+        } catch (e) {
+          Fluttertoast.showToast(
+            msg: e.toString(),
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.SNACKBAR,
+            backgroundColor: Colors.black54,
+            textColor: Colors.white,
+            fontSize: 14.0,
+          );
+          setState(() {
+            _isGlowing = false;
+          });
+        }
       }
     }
   }
