@@ -101,7 +101,7 @@ class AuthService {
           .signInWithEmailAndPassword(email: email, password: password);
       await Future.delayed(const Duration(seconds: 1));
       setLoading(false); // Set loading to false after process completes
-      if (email == "mailto:admin@helpcenter.com" && password == "password") {
+      if (email == "admin@helpcenter.com" && password == "password") {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
