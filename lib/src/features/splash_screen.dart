@@ -20,10 +20,25 @@ class _SplashScreenState extends State<SplashScreen> {
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => WelcomePage()));
         } else {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => UserHomePage(
-                    uid: user.uid,
-                  )));
+           if (user.email == 'admin@helpcenter.com') {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => EmergencyHelpCenterPage(
+                        uid: user.uid,
+                      )),
+              (route) => false,
+            );
+          } else {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => UserHomePage(
+                      uid: user.uid,
+                    )));
+          }
+          // Navigator.of(context).pushReplacement(MaterialPageRoute(
+          //     builder: (context) => UserHomePage(
+          //           uid: user.uid,
+          //         )));
         }
       });
     });
