@@ -1,8 +1,11 @@
 import 'package:emergency_alert_app/src/features/help_center/alert_view.dart';
 import 'package:emergency_alert_app/src/features/help_center/emergency_model.dart';
+import 'package:emergency_alert_app/src/features/user/hospitals_page.dart';
+import 'package:emergency_alert_app/src/features/user/police_stations.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:emergency_alert_app/src/features/auth/auth_services.dart';
 
 class EmergencyHelpCenterPage extends StatefulWidget {
 final String uid;
@@ -15,9 +18,12 @@ final String uid;
 }
 
 class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
-  String getTimeDifference(String dateTimeString) {
-    final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-    final DateTime dateTime = dateFormat.parse(dateTimeString);
+ Map<String, dynamic> userData = {};
+ 
+  bool _isLoggingOut = false;
+String getTimeDifference(String dateTimeString) {
+  try {
+    final DateTime dateTime = DateTime.parse(dateTimeString); // Automatically parses fractional seconds.
     final Duration difference = DateTime.now().difference(dateTime);
 
     if (difference.inMinutes < 60) {
@@ -26,6 +32,30 @@ class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
       return '${difference.inHours} hours ago';
     } else {
       return '${difference.inDays} days ago';
+    }
+  } catch (e) {
+    return 'Invalid date format';
+  }
+}
+
+ @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    init();
+  }
+ init() async {
+    Map<String, dynamic>? user = await retrieveUserData(widget.uid);
+    if (user!.isNotEmpty) {
+      setState(() {
+        userData = user;
+        if (userData.containsKey('emergency_contacts') &&
+            userData['emergency_contacts'] is List) {
+          // numbers = (userData['emergency_contacts'] as List)
+          //     .map((contact) => contact['number'].toString())
+          //     .toList();
+        }
+      });
     }
   }
 
@@ -63,6 +93,89 @@ class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
         foregroundColor: Colors.white,
         title: Text('Emergency Help Center'),
       ),
+        drawer: Drawer(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(userData['user_name'] ?? 'User Name'),
+              accountEmail: Text(userData['email'] ?? 'Email not available'),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Colors.grey,
+                child: Icon(
+                  Icons.person,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+            ),
+            // ListTile(
+            //   leading: const Icon(Icons.contact_page),
+            //   title: const Text('Contact Screen'),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => ManageEmergencyContactsPage(
+            //           uid: widget.uid,
+            //         ),
+            //       ),
+            //     );
+            //   },
+            // ),
+          ListTile(
+              leading: const Icon(Icons.local_hospital),
+              title: const Text('Hospitals'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HospitalsListPage(
+                     
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_police),
+              title: const Text('Police Stations'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PoliceStationsListPage(
+                     
+                    ),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: _isLoggingOut
+                  ? null
+                  : () async {
+                      Navigator.pop(context);
+                      setState(() {
+                        _isLoggingOut = true;
+                      });
+                      await AuthService.signout(
+                        context: context,
+                        setLoading: (loading) {
+                          setState(() {
+                            _isLoggingOut = loading;
+                          });
+                        },
+                      );
+                    },
+            ),
+          ],
+        ),
+      ),
+     
       body: FutureBuilder<List<EmergencyAlert>>(
         future: fetchAlerts(),
         builder: (context, snapshot) {
@@ -77,6 +190,8 @@ class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
             itemCount: alerts.length,
             itemBuilder: (context, index) {
               final alert = alerts[index];
+              print(alert.dateTime);
+              print(getTimeDifference(alert.dateTime));
               return Card(
                 margin: EdgeInsets.all(8.0),
                 child: ListTile(
@@ -101,5 +216,25 @@ class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
         },
       ),
     );
+  }
+   Future<Map<String, dynamic>?> retrieveUserData(String uid) async {
+    try {
+      // Reference to the user document in Firestore
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (userDoc.exists) {
+        // Convert document data into a map and return it
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+        return userData; // Return the user data
+      } else {
+        print("No user data found for this UID.");
+        return null;
+      }
+    } catch (e) {
+      print("Error retrieving user data: $e");
+      return null; // Return null if there's an error
+    }
   }
 }

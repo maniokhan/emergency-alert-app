@@ -1,8 +1,10 @@
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_alert_app/src/features/auth/auth_services.dart';
+import 'package:emergency_alert_app/src/features/user/hospitals_page.dart';
 // import 'package:emergency_alert_app/src/features/auth/contact_save_form.dart';
 import 'package:emergency_alert_app/src/features/user/manage_emergency_contacts_page.dart';
+import 'package:emergency_alert_app/src/features/user/police_stations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -206,6 +208,34 @@ class _UserHomePageState extends State<UserHomePage> {
                   MaterialPageRoute(
                     builder: (context) => ManageEmergencyContactsPage(
                       uid: widget.uid,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_hospital),
+              title: const Text('Hospitals'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HospitalsListPage(
+                     
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_police),
+              title: const Text('Police Stations'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PoliceStationsListPage(
+                     
                     ),
                   ),
                 );

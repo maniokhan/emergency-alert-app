@@ -1,4 +1,5 @@
 import 'package:emergency_alert_app/src/features/auth/welcome_page.dart';
+import 'package:emergency_alert_app/src/features/help_center/home.dart';
 import 'package:emergency_alert_app/src/features/user/user_home.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => WelcomePage()));
         } else {
-           if (user.email == 'admin@helpcenter.com') {
+          if (user.email == 'admin@helpcenter.com') {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
@@ -35,10 +36,6 @@ class _SplashScreenState extends State<SplashScreen> {
                       uid: user.uid,
                     )));
           }
-          // Navigator.of(context).pushReplacement(MaterialPageRoute(
-          //     builder: (context) => UserHomePage(
-          //           uid: user.uid,
-          //         )));
         }
       });
     });
