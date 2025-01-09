@@ -8,43 +8,46 @@ import 'package:intl/intl.dart';
 import 'package:emergency_alert_app/src/features/auth/auth_services.dart';
 
 class EmergencyHelpCenterPage extends StatefulWidget {
-final String uid;
+  final String uid;
   const EmergencyHelpCenterPage({
     super.key,
     required this.uid,
   });
   @override
-  State<EmergencyHelpCenterPage> createState() => _EmergencyHelpCenterPageState();
+  State<EmergencyHelpCenterPage> createState() =>
+      _EmergencyHelpCenterPageState();
 }
 
 class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
- Map<String, dynamic> userData = {};
- 
+  Map<String, dynamic> userData = {};
+
   bool _isLoggingOut = false;
-String getTimeDifference(String dateTimeString) {
-  try {
-    final DateTime dateTime = DateTime.parse(dateTimeString); // Automatically parses fractional seconds.
-    final Duration difference = DateTime.now().difference(dateTime);
+  String getTimeDifference(String dateTimeString) {
+    try {
+      final DateTime dateTime = DateTime.parse(
+          dateTimeString); // Automatically parses fractional seconds.
+      final Duration difference = DateTime.now().difference(dateTime);
 
-    if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} minutes ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours} hours ago';
-    } else {
-      return '${difference.inDays} days ago';
+      if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} minutes ago';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours} hours ago';
+      } else {
+        return '${difference.inDays} days ago';
+      }
+    } catch (e) {
+      return 'Invalid date format';
     }
-  } catch (e) {
-    return 'Invalid date format';
   }
-}
 
- @override
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
     init();
   }
- init() async {
+
+  init() async {
     Map<String, dynamic>? user = await retrieveUserData(widget.uid);
     if (user!.isNotEmpty) {
       setState(() {
@@ -60,9 +63,8 @@ String getTimeDifference(String dateTimeString) {
   }
 
   Future<List<EmergencyAlert>> fetchAlerts() async {
-    final sosRequestsSnapshot = await FirebaseFirestore.instance
-        .collection('SOS-Requests')
-        .get();
+    final sosRequestsSnapshot =
+        await FirebaseFirestore.instance.collection('SOS-Requests').get();
     final List<EmergencyAlert> alerts = [];
 
     for (var doc in sosRequestsSnapshot.docs) {
@@ -70,11 +72,12 @@ String getTimeDifference(String dateTimeString) {
           .collection('users')
           .doc(doc['userID'])
           .get();
-      
+
       final alert = EmergencyAlert(
         sosReqID: doc['sosReqID'],
         userName: userSnapshot['user_name'],
-        dateTime: DateTime.now().toString(), // Customize date format if available
+        dateTime:
+            DateTime.now().toString(), // Customize date format if available
         latitude: doc['latitude'],
         longitude: doc['longitude'],
         message: doc['message'],
@@ -93,7 +96,7 @@ String getTimeDifference(String dateTimeString) {
         foregroundColor: Colors.white,
         title: Text('Emergency Help Center'),
       ),
-        drawer: Drawer(
+      drawer: Drawer(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -123,16 +126,14 @@ String getTimeDifference(String dateTimeString) {
             //     );
             //   },
             // ),
-          ListTile(
+            ListTile(
               leading: const Icon(Icons.local_hospital),
               title: const Text('Hospitals'),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => HospitalsListPage(
-                     
-                    ),
+                    builder: (context) => HospitalsListPage(),
                   ),
                 );
               },
@@ -144,9 +145,7 @@ String getTimeDifference(String dateTimeString) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PoliceStationsListPage(
-                     
-                    ),
+                    builder: (context) => PoliceStationsListPage(),
                   ),
                 );
               },
@@ -175,7 +174,6 @@ String getTimeDifference(String dateTimeString) {
           ],
         ),
       ),
-     
       body: FutureBuilder<List<EmergencyAlert>>(
         future: fetchAlerts(),
         builder: (context, snapshot) {
@@ -202,12 +200,12 @@ String getTimeDifference(String dateTimeString) {
                   title: Text(alert.userName),
                   subtitle: Text(getTimeDifference(alert.dateTime)),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EmergencyAlertDetailsPage(alert: alert),
-                      ),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => EmergencyAlertDetailsPage(alert: alert),
+                    //   ),
+                    // );
                   },
                 ),
               );
@@ -217,7 +215,8 @@ String getTimeDifference(String dateTimeString) {
       ),
     );
   }
-   Future<Map<String, dynamic>?> retrieveUserData(String uid) async {
+
+  Future<Map<String, dynamic>?> retrieveUserData(String uid) async {
     try {
       // Reference to the user document in Firestore
       DocumentSnapshot userDoc =
