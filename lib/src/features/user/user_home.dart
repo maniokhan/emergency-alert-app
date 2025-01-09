@@ -140,6 +140,7 @@ class _UserHomePageState extends State<UserHomePage> {
             "latitude": position.latitude,
             "longitude": position.longitude,
             "message": sosMessage,
+            "timestamp":DateTime.now(),
           });
           Fluttertoast.showToast(
             msg: "SOS message sended successfully!",

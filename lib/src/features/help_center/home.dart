@@ -8,46 +8,49 @@ import 'package:intl/intl.dart';
 import 'package:emergency_alert_app/src/features/auth/auth_services.dart';
 
 class EmergencyHelpCenterPage extends StatefulWidget {
-  final String uid;
+final String uid;
   const EmergencyHelpCenterPage({
     super.key,
     required this.uid,
   });
   @override
-  State<EmergencyHelpCenterPage> createState() =>
-      _EmergencyHelpCenterPageState();
+  State<EmergencyHelpCenterPage> createState() => _EmergencyHelpCenterPageState();
 }
 
 class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
-  Map<String, dynamic> userData = {};
-
+ Map<String, dynamic> userData = {};
+ 
   bool _isLoggingOut = false;
-  String getTimeDifference(String dateTimeString) {
-    try {
-      final DateTime dateTime = DateTime.parse(
-          dateTimeString); // Automatically parses fractional seconds.
-      final Duration difference = DateTime.now().difference(dateTime);
 
-      if (difference.inMinutes < 60) {
-        return '${difference.inMinutes} minutes ago';
-      } else if (difference.inHours < 24) {
-        return '${difference.inHours} hours ago';
-      } else {
-        return '${difference.inDays} days ago';
-      }
-    } catch (e) {
-      return 'Invalid date format';
+String getTimeDifference(Timestamp timestamp) {
+  try {
+    final DateTime dateTime = timestamp.toDate(); // Convert Firestore Timestamp to DateTime
+    final DateTime now = DateTime.now();
+    final Duration difference = now.difference(dateTime);
+
+    if (difference.inMinutes < 1) {
+      return 'Just now';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} minutes ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else {
+      final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+      return dateFormat.format(dateTime); // Format as "YYYY-MM-DD HH:MM"
     }
+  } catch (e) {
+    return 'Invalid date format';
   }
+}
 
-  @override
+
+ @override
   void initState() {
     // TODO: implement initState
     super.initState();
     init();
   }
-
-  init() async {
+ init() async {
     Map<String, dynamic>? user = await retrieveUserData(widget.uid);
     if (user!.isNotEmpty) {
       setState(() {
@@ -61,31 +64,41 @@ class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
       });
     }
   }
-
-  Future<List<EmergencyAlert>> fetchAlerts() async {
-    final sosRequestsSnapshot =
-        await FirebaseFirestore.instance.collection('SOS-Requests').get();
+Stream<List<EmergencyAlert>> fetchAlerts() {
+  return FirebaseFirestore.instance
+      .collection('SOS-Requests')
+      .orderBy('timestamp', descending: true) // Fetch data ordered by timestamp
+      .snapshots()
+      .asyncMap((snapshot) async {
     final List<EmergencyAlert> alerts = [];
 
-    for (var doc in sosRequestsSnapshot.docs) {
-      final userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(doc['userID'])
-          .get();
-
-      final alert = EmergencyAlert(
-        sosReqID: doc['sosReqID'],
-        userName: userSnapshot['user_name'],
-        dateTime:
-            DateTime.now().toString(), // Customize date format if available
-        latitude: doc['latitude'],
-        longitude: doc['longitude'],
-        message: doc['message'],
-      );
-      alerts.add(alert);
+    for (var doc in snapshot.docs) {
+      try {
+        // Fetch user data from 'users' collection using userID
+        final userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(doc['userID'])
+            .get();
+print(doc);
+        // final timestamp = doc['timestamp']; // Firestore Timestamp
+        final alert = EmergencyAlert(
+          sosReqID: doc['sosReqID'],
+          userName: userSnapshot['user_name'] ?? 'Unknown User', // Safely handle if user_name is missing
+          dateTime:doc['timestamp'], // Convert Firestore Timestamp to DateTime
+          latitude: doc['latitude'],
+          longitude: doc['longitude'],
+          message: doc['message'],
+        );
+        alerts.add(alert);
+      } catch (e) {
+        print('Error fetching user data: $e');
+      }
     }
+
     return alerts;
-  }
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +109,7 @@ class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
         foregroundColor: Colors.white,
         title: Text('Emergency Help Center'),
       ),
-      drawer: Drawer(
+        drawer: Drawer(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -126,14 +139,16 @@ class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
             //     );
             //   },
             // ),
-            ListTile(
+          ListTile(
               leading: const Icon(Icons.local_hospital),
               title: const Text('Hospitals'),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => HospitalsListPage(),
+                    builder: (context) => HospitalsListPage(
+                     
+                    ),
                   ),
                 );
               },
@@ -145,7 +160,9 @@ class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PoliceStationsListPage(),
+                    builder: (context) => PoliceStationsListPage(
+                     
+                    ),
                   ),
                 );
               },
@@ -174,49 +191,58 @@ class _EmergencyHelpCenterPageState extends State<EmergencyHelpCenterPage> {
           ],
         ),
       ),
-      body: FutureBuilder<List<EmergencyAlert>>(
-        future: fetchAlerts(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error loading data'));
-          }
-          final alerts = snapshot.data ?? [];
-          return ListView.builder(
-            itemCount: alerts.length,
-            itemBuilder: (context, index) {
-              final alert = alerts[index];
-              print(alert.dateTime);
-              print(getTimeDifference(alert.dateTime));
-              return Card(
-                margin: EdgeInsets.all(8.0),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Icon(Icons.person, color: Colors.grey),
-                  ),
-                  title: Text(alert.userName),
-                  subtitle: Text(getTimeDifference(alert.dateTime)),
-                  onTap: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => EmergencyAlertDetailsPage(alert: alert),
-                    //   ),
-                    // );
-                  },
+     
+  body: StreamBuilder<List<EmergencyAlert>>(
+  stream: fetchAlerts(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (snapshot.hasError) {
+      return Center(child: Text('Error loading data: ${snapshot.error}'));
+    }
+
+    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      return Center(child: Text('No data available'));
+    }
+
+    final alerts = snapshot.data!;
+    return ListView.builder(
+      itemCount: alerts.length,
+      itemBuilder: (context, index) {
+        final alert = alerts[index];
+        print(alert.dateTime); // Debug print to check alert data
+        return Card(
+          margin: EdgeInsets.all(8.0),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, color: Colors.grey),
+            ),
+            title: Text(alert.userName),
+            subtitle: Text(getTimeDifference(alert.dateTime)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EmergencyAlertDetailsPage(alert: alert),
                 ),
               );
             },
-          );
-        },
-      ),
+          ),
+        );
+      },
+    );
+  },
+)
+
+   
+   
+   
     );
   }
-
-  Future<Map<String, dynamic>?> retrieveUserData(String uid) async {
+   Future<Map<String, dynamic>?> retrieveUserData(String uid) async {
     try {
       // Reference to the user document in Firestore
       DocumentSnapshot userDoc =

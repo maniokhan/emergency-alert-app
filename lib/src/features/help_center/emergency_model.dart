@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class EmergencyAlert {
   final String sosReqID;
   final String userName;
-  final String dateTime;
+  final Timestamp dateTime;
   final double latitude;
   final double longitude;
   final String message;
